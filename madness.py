@@ -2,12 +2,7 @@ import numpy as np
 import pandas as pd
 from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as bs
-
-url = 'https://www.espn.com/mens-college-basketball/bpi/_/group/'
-url2 = 'https://www.espn.com/mens-college-basketball/stats/team'
-url3 = 'https://www.espn.com/mens-college-basketball/stats/team/_/view/opponent'
-
-df = pd.DataFrame(columns = ['name', 'conf', 'bpi', 'off', 'def', 'ppg', 'oppg'])
+from time import sleep
 
 def read_page(url):
     uClient = uReq(url)
@@ -15,17 +10,31 @@ def read_page(url):
     uClient.close()
     return page
 
-for i in range(1,33):
+'''
+url = 'https://www.espn.com/mens-college-basketball/bpi/_/group/'
+df = pd.DataFrame(columns = ['name', 'conf', 'bpi', 'off', 'def', 'ppg', 'oppg'])
+
+for i in range(1,35):
     soup = bs(read_page(url+str(i)), 'html.parser')
     foo = soup.findAll('tr', {'class': 'Table__TR Table__TR--sm Table__even'})
     n = len(foo)//2
     for j in range(n):
+        id = foo[j].find('a', {'class': 'AnchorLink'})['href']
+        soup = bs(read_page('https://www.espn.com'+id), 'html.parser')
+        bar = soup.findAll('div', {'class': 'tc h2 clr-gray-03'})
+        ppg = bar[0].text
+        oppg = bar[3].text
         team = foo[j].findAll('td')
         stats = foo[j+n].findAll('div')
-        df.loc[len(df)] = [team[0].text, team[1].text, float(stats[1].text), float(stats[4].text), float(stats[5].text), 0, 0]
+        df.loc[len(df)] = [team[0].text, team[1].text, float(stats[1].text), float(stats[4].text), float(stats[5].text), float(ppg), float(oppg)]
 
-print(df)
+df = df.sort_values(by=['bpi'], ascending=False)
+df.to_csv('dataset.tsv', sep='\t', index=False)
 df.to_csv('dataset.csv', index=False)
+'''
+
+df = pd.read_csv('dataset.csv')
+print(df)
 
 def formula1(team1, team2):
 
