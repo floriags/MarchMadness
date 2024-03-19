@@ -4,23 +4,6 @@ import pandas as pd
 df = pd.read_csv('bracket.csv')
 names = df['name']
 
-min_off, max_off = df['off'].min(), df['off'].max()
-min_def, max_def = df['def'].min(), df['def'].max()
-min_bpi, max_bpi = df['bpi'].min(), df['bpi'].max()
-
-off_w = np.linspace(0, 1, int(max_off-min_off)+1)
-def_w = np.linspace(0, 1, int(max_def-min_def)+1)
-bpi_w = np.linspace(0, 1, int(max_bpi-min_bpi)+1)
-
-def scale(val, min_val, max_val):
-    return (val-min_val)/(max_val-min_val)
-
-def min_max_scaling(values):
-    min_value = min(values)
-    max_value = max(values)
-    scaled_values = [(x - min_value) / (max_value - min_value) for x in values]
-    return scaled_values
-
 def bracket(team1, team2):
     name1, bpi1, off1, def1, ppg1, oppg1 = team1[['name', 'bpi', 'off', 'def', 'ppg', 'oppg']].iloc[0]
     name2, bpi2, off2, def2, ppg2, oppg2 = team2[['name', 'bpi', 'off', 'def', 'ppg', 'oppg']].iloc[0]
@@ -28,26 +11,19 @@ def bracket(team1, team2):
     #George is getting Upset!
     w1 = bpi1/(bpi1+bpi2)
     w2 = bpi2/(bpi1+bpi2)
-    score1 = ppg1*w1+oppg2*w2
-    score2 = ppg2*w2+oppg1*w1
 
     #These Upsets are making me thirsty!
     w1 = off1/(off1+def2)
     w2 = off2/(off2+def1)
+
+    #A bracket about nothing
+    w1 = off1/(off1+bpi2)
+    w2 = off2/(off2+bpi1)
+
     score1 = (ppg1+oppg2)*w1
     score2 = (ppg2+oppg1)*w2
 
-    #A bracket about nothing
-    w_ppg = 0.4
-    w_oppg = 0.6
-    w_off = 0.4
-    w_def = 0.6
-    w_bpi = 0.5
-    
-    score1 = w_ppg*ppg1 + w_oppg*oppg2 + w_off*off1 - w_def*def2 + w_bpi*bpi1
-    score2 = w_ppg*ppg2 + w_oppg*oppg1 + w_off*off2 - w_def*def1 + w_bpi*bpi2
-
-    print("{:>26s} {:6.2f} - {:.2f} {}".format(name1, score1, score2, name2))
+    print("{:>26s} {:6.2f} - {:.2f} {:<}".format(name1, score1, score2, name2))
 
     if score1 > score2:
         return name1
