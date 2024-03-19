@@ -38,10 +38,10 @@ def bracket(team1, team2):
     score2 = (ppg2+oppg1)*w2
 
     #A bracket about nothing
-    w_ppg = 0.3
-    w_oppg = 1-w_ppg
-    w_off = 0.3
-    w_def = 1-w_off
+    w_ppg = 0.4
+    w_oppg = 0.6
+    w_off = 0.4
+    w_def = 0.6
     w_bpi = 0.5
     
     score1 = w_ppg*ppg1 + w_oppg*oppg2 + w_off*off1 - w_def*def2 + w_bpi*bpi1
