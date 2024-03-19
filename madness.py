@@ -1,83 +1,53 @@
 import numpy as np
 import pandas as pd
-from urllib.request import urlopen as uReq
-from bs4 import BeautifulSoup as bs
-from time import sleep
-
-def read_page(url):
-    uClient = uReq(url)
-    page = uClient.read()
-    uClient.close()
-    return page
-
-def get_data():
-    url = 'https://www.espn.com/mens-college-basketball/bpi/_/group/'
-    df = pd.DataFrame(columns = ['name', 'conf', 'bpi', 'off', 'def', 'ppg', 'oppg'])
-
-    i = 1
-    conferences = 32
-
-    while conferences > 1:
-        soup = bs(read_page(url+str(i)), 'html.parser')
-        foo = soup.findAll('tr', {'class': 'Table__TR Table__TR--sm Table__even'})
-        n = len(foo)//2
-        for j in range(n):
-            id = foo[j].find('a', {'class': 'AnchorLink'})['href']
-            soup = bs(read_page('https://www.espn.com'+id), 'html.parser')
-            bar = soup.findAll('div', {'class': 'tc h2 clr-gray-03'})
-            ppg = bar[0].text
-            oppg = bar[3].text
-            team = foo[j].findAll('td')
-            stats = foo[j+n].findAll('div')
-            df.loc[len(df)] = [team[0].text, team[1].text, float(stats[1].text), float(stats[4].text), float(stats[5].text), float(ppg), float(oppg)]
-        if n != 0:
-            conferences -= 1
-        i += 1
-        sleep(1)
-    df = df.sort_values(by=['bpi', 'off'], ascending=False)
-    df.to_csv('dataset.tsv', sep='\t', index=False)
-    df.to_csv('dataset.csv', index=False)
-
-def get_bracket():
-    url1 = 'https://www.espn.com/mens-college-basketball/bpi/_/group/100'
-    url2 = 'https://www.espn.com/mens-college-basketball/bpi/_/group/100/sort/bpi.bpi/dir/asc'
-    df = pd.DataFrame(columns = ['name', 'bpi', 'off', 'def', 'ppg', 'oppg'])
-
-    for url in [url1, url2]:
-        soup = bs(read_page(url), 'html.parser')
-        foo = soup.findAll('tr', {'class': 'Table__TR Table__TR--sm Table__even'})
-        for i in range(34):
-            id = foo[i].find('a', {'class': 'AnchorLink'})['href']
-            soup = bs(read_page('https://www.espn.com'+id), 'html.parser')
-            bar = soup.findAll('div', {'class': 'tc h2 clr-gray-03'})
-            ppg = bar[0].text
-            oppg = bar[3].text
-            name = foo[i].td.text
-            stats = foo[i+50].findAll('td')
-            df.loc[len(df)] = [name, float(stats[1].text), float(stats[4].text), float(stats[5].text), float(ppg), float(oppg)]
-    df = df.sort_values(by=['bpi', 'off'], ascending=False)
-    df.to_csv('bracket.tsv', sep='\t', index=False)
-    df.to_csv('bracket.csv', index=False)
 
 df = pd.read_csv('bracket.csv')
 names = df['name']
+
+min_off, max_off = df['off'].min(), df['off'].max()
+min_def, max_def = df['def'].min(), df['def'].max()
+min_bpi, max_bpi = df['bpi'].min(), df['bpi'].max()
+
+off_w = np.linspace(0, 1, int(max_off-min_off)+1)
+def_w = np.linspace(0, 1, int(max_def-min_def)+1)
+bpi_w = np.linspace(0, 1, int(max_bpi-min_bpi)+1)
+
+def scale(val, min_val, max_val):
+    return (val-min_val)/(max_val-min_val)
+
+def min_max_scaling(values):
+    min_value = min(values)
+    max_value = max(values)
+    scaled_values = [(x - min_value) / (max_value - min_value) for x in values]
+    return scaled_values
 
 def bracket(team1, team2):
     name1, bpi1, off1, def1, ppg1, oppg1 = team1[['name', 'bpi', 'off', 'def', 'ppg', 'oppg']].iloc[0]
     name2, bpi2, off2, def2, ppg2, oppg2 = team2[['name', 'bpi', 'off', 'def', 'ppg', 'oppg']].iloc[0]
 
-    '''
-    George is getting Upset!
-    '''
-    wo = 1/3
-    wd = 2/3
-    score1 = (ppg1*wo)+(oppg2*wd)
-    score2 = (ppg2*wo)+(oppg1*wd)
+    #George is getting Upset!
+    w1 = bpi1/(bpi1+bpi2)
+    w2 = bpi2/(bpi1+bpi2)
+    score1 = ppg1*w1+oppg2*w2
+    score2 = ppg2*w2+oppg1*w1
 
-    print("{} {:.2f} - {:.2f} {}".format(name1, score1, score2, name2))
+    #These Upsets are making me thirsty!
+    w1 = off1/(off1+def2)
+    w2 = off2/(off2+def1)
+    score1 = (ppg1+oppg2)*w1
+    score2 = (ppg2+oppg1)*w2
 
-    if score1 == score2:
-        print("\n\nLikt\n\n")
+    #A bracket about nothing
+    w_ppg = 0.3
+    w_oppg = 1-w_ppg
+    w_off = 0.3
+    w_def = 1-w_off
+    w_bpi = 0.5
+    
+    score1 = w_ppg*ppg1 + w_oppg*oppg2 + w_off*off1 - w_def*def2 + w_bpi*bpi1
+    score2 = w_ppg*ppg2 + w_oppg*oppg1 + w_off*off2 - w_def*def1 + w_bpi*bpi2
+
+    print("{:>26s} {:6.2f} - {:.2f} {}".format(name1, score1, score2, name2))
 
     if score1 > score2:
         return name1
