@@ -40,7 +40,7 @@ g7 = bracket(df.loc[names=='Washington State Cougars'], df.loc[names=='Drake Bul
 g8 = bracket(df.loc[names=='Iowa State Cyclones'], df.loc[names=='South Dakota State Jackrabbits'])
 
 print('\nWest')
-g9 = bracket(df.loc[names=='North Carolina Tar Heels'], df.loc[names=='Howard Bison']) #Wagner Seahawks
+g9 = bracket(df.loc[names=='North Carolina Tar Heels'], df.loc[names=='Wagner Seahawks'])
 g10 = bracket(df.loc[names=='Mississippi State Bulldogs'], df.loc[names=='Michigan State Spartans'])
 g11 = bracket(df.loc[names=='Saint Mary\'s Gaels'], df.loc[names=='Grand Canyon Lopes'])
 g12 = bracket(df.loc[names=='Alabama Crimson Tide'], df.loc[names=='Charleston Cougars'])
@@ -56,17 +56,17 @@ g19 = bracket(df.loc[names=='Wisconsin Badgers'], df.loc[names=='James Madison D
 g20 = bracket(df.loc[names=='Duke Blue Devils'], df.loc[names=='Vermont Catamounts'])
 g21 = bracket(df.loc[names=='Texas Tech Red Raiders'], df.loc[names=='NC State Wolfpack'])
 g22 = bracket(df.loc[names=='Kentucky Wildcats'], df.loc[names=='Oakland Golden Grizzlies'])
-g23 = bracket(df.loc[names=='Florida Gators'], df.loc[names=='Boise State Broncos']) #Colorado Buffaloes
+g23 = bracket(df.loc[names=='Florida Gators'], df.loc[names=='Colorado Buffaloes'])
 g24 = bracket(df.loc[names=='Marquette Golden Eagles'], df.loc[names=='Western Kentucky Hilltoppers'])
 
 print('\nMidwest')
-g25 = bracket(df.loc[names=='Purdue Boilermakers'], df.loc[names=='Grambling Tigers']) #Montana State Bobcats
+g25 = bracket(df.loc[names=='Purdue Boilermakers'], df.loc[names=='Grambling Tigers'])
 g26 = bracket(df.loc[names=='Utah State Aggies'], df.loc[names=='TCU Horned Frogs'])
 g27 = bracket(df.loc[names=='Gonzaga Bulldogs'], df.loc[names=='McNeese Cowboys'])
 g28 = bracket(df.loc[names=='Kansas Jayhawks'], df.loc[names=='Samford Bulldogs'])
 g29 = bracket(df.loc[names=='South Carolina Gamecocks'], df.loc[names=='Oregon Ducks'])
 g30 = bracket(df.loc[names=='Creighton Bluejays'], df.loc[names=='Akron Zips'])
-g31 = bracket(df.loc[names=='Texas Longhorns'], df.loc[names=='Virginia Cavaliers']) #Colorado State Rams
+g31 = bracket(df.loc[names=='Texas Longhorns'], df.loc[names=='Colorado State Rams'])
 g32 = bracket(df.loc[names=='Tennessee Volunteers'], df.loc[names=='Saint Peter\'s Peacocks'])
 
 print('\nSecond round')
